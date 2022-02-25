@@ -39,11 +39,7 @@ public class SparkJob<Bean> {
 	private static final String FAILURE_FILE = "_FAILURE";
 	
 	public SparkJob(String name, Class<Bean> beanClass, BeanBuilder<Bean> beanBuilder) {
-		this.spark = SparkSession.builder()
-				.appName(name)
-				.master("local[*]")
-				.getOrCreate();
-		
+		this.spark = this.buildSparkSession(name);
 		this.beanClass = beanClass;
 		this.beanBuilder = beanBuilder;
 	}
@@ -111,6 +107,13 @@ public class SparkJob<Bean> {
 		writer.close();
 		
 		new File(outputDir, SUCCESS_FILE).createNewFile();
+	}
+	
+	private SparkSession buildSparkSession(String appName) {
+		return SparkSession.builder()
+				.appName(appName)
+				.master("local[*]")
+				.getOrCreate();
 	}
 	
 	private DataFrameReader createCsvReader(SparkSession spark) {
