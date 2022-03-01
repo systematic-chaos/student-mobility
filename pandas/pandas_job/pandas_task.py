@@ -8,6 +8,7 @@ Universitat Politècnica de València
 
 import os
 import pandas as pd
+import dask.dataframe as dd
 from sys import exit, stdout
 
 CSV_SPLIT = ';'
@@ -15,7 +16,7 @@ OUTPUT_FILE = "part-r-0000"
 SUCCESS_FILE = "_SUCCESS"
 FAILURE_FILE = "_FAILURE"
 
-def compute_task(task_func, bean, args):
+def compute_task(task_func, bean, args, parallelize=False):
     if len(args) == 1:
         input = args
         output = None
@@ -26,15 +27,18 @@ def compute_task(task_func, bean, args):
         print('Usage: python student_mobility <in> [[<in>...] <out>]')
         exit(2)
     
-    return launch_task(input, output, task_func, bean.get_converters())
+    return launch_task(input, output, task_func, bean.get_converters(), parallelize)
 
-def launch_task(input, output, task_func, converters):
-    df = read_dataframe(input, converters)
+def launch_task(input, output, task_func, converters, parallelize=False):
+    df = read_dataframe_pandas(input, converters) \
+        if not parallelize else read_dataframe_dask(input, converters)
 
     success = True
     if task_func:
         try:
             df = task_func(df)
+            if parallelize:
+                df = df.compute()
         except Exception as e:
             success = False
             ex = e
@@ -47,20 +51,35 @@ def launch_task(input, output, task_func, converters):
         print(ex)
     return df
 
-def read_dataframe(input, converters):
+def read_dataframe_pandas(input, converters):
     converters = { index: conversion for index, conversion in enumerate(converters) }
     if isinstance(input, str):
-        df = read_csv(input, converters)
+        df = read_csv_pandas(input, converters)
     else:
-        df = pd.concat([read_csv(i, converters) for i in input],
+        df = pd.concat([ read_csv_pandas(i, converters) for i in input ],
                         ignore_index=True)
     return df
 
+def read_dataframe_dask(input, converters):
+    converters = { index: conversion for index, conversion in enumerate(converters) }
+    if isinstance(input, str):
+        df = read_csv_dask(input, converters)
+    else:
+        df = dd.multi.concat([ read_csv_dask(i, converters) for i in input ],
+                            interleave_partitions=True)
+    return df
 
-def read_csv(input_file, converters_dict):
+def read_csv_pandas(input_file, converters_dict):
     return pd.read_csv(input_file,
                         sep=CSV_SPLIT,
                         index_col=False,
+                        converters=converters_dict,
+                        na_filter=False,
+                        low_memory=True)
+
+def read_csv_dask(input_file, converters_dict):
+    return dd.read_csv(input_file,
+                        sep=CSV_SPLIT,
                         converters=converters_dict,
                         na_filter=False,
                         low_memory=True)
