@@ -9,14 +9,16 @@ Universitat Politècnica de València
 import os
 import pandas as pd
 import dask.dataframe as dd
+import matplotlib.pyplot as plt
 from sys import exit, stdout
 
 CSV_SPLIT = ';'
 OUTPUT_FILE = "part-r-0000"
 SUCCESS_FILE = "_SUCCESS"
 FAILURE_FILE = "_FAILURE"
+FIGURE_FILE = "plot"
 
-def compute_task(task_func, bean, args, parallelize=False):
+def compute_task(task_func, bean, args, plot=False, parallelize=False):
     if len(args) == 1:
         input = args
         output = None
@@ -27,9 +29,9 @@ def compute_task(task_func, bean, args, parallelize=False):
         print('Usage: python student_mobility <in> [[<in>...] <out>]')
         exit(2)
     
-    return launch_task(input, output, task_func, bean.get_converters(), parallelize)
+    return launch_task(input, output, task_func, bean.get_converters(), plot, parallelize)
 
-def launch_task(input, output, task_func, converters, parallelize=False):
+def launch_task(input, output, task_func, converters, plot=False, parallelize=False):
     df = read_dataframe_pandas(input, converters) \
         if not parallelize else read_dataframe_dask(input, converters)
 
@@ -39,16 +41,28 @@ def launch_task(input, output, task_func, converters, parallelize=False):
             df = task_func(df)
             if parallelize:
                 df = df.compute()
+            if plot:
+                if round(df.sum(), 2) > 1:
+                    draw_bar_plot(df, plot)
+                else:
+                    draw_pie_plot(df, plot)
         except Exception as e:
             success = False
             ex = e
     
     if output:
         write_output(df, output, success)
+    
     if success:
         print_output(df)
+        if plot:
+            if output:
+                save_figure(output)
+            else:
+                plt.show()
     else:
         print(ex)
+
     return df
 
 def read_dataframe_pandas(input, converters):
@@ -115,3 +129,28 @@ def print_output(df, outstream=stdout):
     elif isinstance(df, pd.Series):
         for index, value in df.iteritems():
             outstream.write('{}\t{}\n'.format(index, value))
+
+def draw_bar_plot(series, title=None):
+    plt.figure(figsize=(8, 6))
+    axis = series.plot.bar(color='tab:blue')
+    if title and isinstance(title, str):
+        axis.set_title(title)
+    axis.xaxis.get_label().set_visible(False)
+    axis.set_xticklabels([ label.expandtabs(1) for label in series.index ], \
+        fontsize=8, rotation=45)
+    axis.grid(visible=True, axis='y', which='major', color='lightgray', linewidth=0.5)
+    axis.get_figure().tight_layout()
+    return axis
+
+def draw_pie_plot(series, title=None):
+    plt.figure(figsize=(6, 6))
+    axis = series.plot.pie(colormap='tab10', \
+        labels=[ label.expandtabs(1) for label in series.index ])
+    if title and isinstance(title, str):
+        axis.set_title(title)
+    axis.yaxis.get_label().set_visible(False)
+    axis.get_figure().tight_layout()
+    return axis
+
+def save_figure(fig_path, ext='jpg'):
+    plt.savefig(os.path.join(fig_path, FIGURE_FILE + '.' + ext))
