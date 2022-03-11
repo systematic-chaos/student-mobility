@@ -56,12 +56,12 @@ _General queries:_
 13. Total of exchange students that stay abroad for the fall semester, the spring semester, and the whole academic year, respectively.
 14. Proportion, of those students that initially stay abroad just for the fall semester, that extend their exchange period to the next spring semester.
 15. Total exchange students having been taught per teaching language.
-16. Teaching languages used and proportion of students that, having been taught in that language, received specific training in that language's utilization. This query has been restricted to the English language, or the sake of simplicity in the interpretation of results and data consistency.
+16. Teaching languages used and proportion of students that, having been taught in that language, received specific training in that language's utilization. This query has been restricted to the English language, for the sake of simplicity in the interpretation of results and data consistency.
 17. Average economic grant per European exchange student.
 18. Average economic grant per Spanish exchange student.
-19. Distribution of exchange students in terms of their occupation (study of internship/placement) and level (graduate or postgraduate). Therefore, four groups are considered: Graduate students, graduate interns, postgraduate students and postgraduate interns.
+19. Distribution of exchange students in terms of their occupation (study or internship/placement) and level (graduate or postgraduate). Therefore, four groups are considered: graduate students, graduate interns, postgraduate students and postgraduate interns.
 
 _Specific queries:_
 
-1. How many students, from the same host country as the 22 aged individual, whose home university code is "CIUDA-R" and whose host university code is "S VASTERA", took their Erasmus exchange in the same host university.
+1. How many students, from the same home country as the 22-aged individual, whose home university code is "CIUDA-R" and whose host university code is "S VASTERA", took their Erasmus exchange in the same host university.
 2. How many students, from the home university that the campus with code "CIUDA" belongs to, took their Erasmus exchange in the host university that the campus with code "VASTERA" belongs to. A reference student is provided in order to correlate those campuses to their corresponding universities.

@@ -52,4 +52,31 @@ public class HadoopJobLauncher {
 		}
 		return jobCompletion ? 0 : 1;
 	}
+	
+	public static int launchHadoopJobGraph(HadoopJobGraphGenerator graphGenerator,
+			String[] args) throws Exception {
+		if (args.length < 2) {
+			System.err.println("Usage: HadoopJobGraph <in> [<in>...] <out>");
+			return 2;
+		}
+		
+		int numInputPaths = args.length - 1;
+		HadoopJobNode rootJob = graphGenerator.createJobGraph(
+			Arrays.copyOf(args,  numInputPaths), args[numInputPaths]);
+		try {
+			rootJob.launch();
+			rootJob.awaitResult();
+			
+			// Remove intermediate data directories
+			for (HadoopJobNode predecessorJob : rootJob.getPredecessors()) {
+				predecessorJob.removeOutput();
+			}
+			Functions.trimTextFile(rootJob.getOutputPath());
+		} catch (JobException | InterruptedException e) {
+			System.err.println(e.getMessage());
+			System.err.println(e);
+			return 1;
+		}
+		return 0;
+	}
 }
