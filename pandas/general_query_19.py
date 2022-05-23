@@ -30,7 +30,10 @@ def mobility_type_study_level_distribution(students_df):
     num_students = mtls_groups_df['size'].sum()
     mtls_groups_df['proportion'] = mtls_groups_df['size'].apply(lambda mtls: round_half_down(mtls / num_students))
 
-    #return mtls_groups_df[['MOBILITYTYPE', 'STUDYLEVEL', 'proportion']].sort_values(['MOBILITYTYPE', 'STUDYLEVEL'])
+    mtls_groups_df = mtls_groups_df[['MOBILITYTYPE', 'STUDYLEVEL', 'proportion']]
+    mtls_groups_df = mtls_groups_df.set_index(['MOBILITYTYPE', 'STUDYLEVEL']).sort_index().squeeze()
+    mtls_groups_df.index = mtls_groups_df.index.map(lambda mtls: '{}\t{}'.format(*mtls))
+    return mtls_groups_df
 
 # python3 general_query_19.py ../data/Student_Mobility.csv [out/pandas19-output]
 if __name__ == "__main__":
