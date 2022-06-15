@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>systematicchaos.studentmobility</groupId>
+  <artifactId>hadoop</artifactId>
+  <version>1.0.0</version>
+  
+  <organization>
+  	<name>Systematic Chaos</name>
+  	<url>https://github.com/systematic-chaos</url>
+  </organization>
+  <name>Student Mobility</name>
+  <url>https://github.com/systematic-chaos/student-mobility</url>
+  <description>Student Mobility: Hadoop implementation</description>
+  
+  <properties>
+  	<hadoopVersion>2.7.7</hadoopVersion>
+  	<javaVersion>1.8</javaVersion>
+  </properties>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <source>${javaVersion}</source>
+          <target>${javaVersion}</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.apache.hadoop</groupId>
+  		<artifactId>hadoop-common</artifactId>
+  		<version>${hadoopVersion}</version>
+  		<scope>provided</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.apache.hadoop</groupId>
+  		<artifactId>hadoop-mapreduce-client-core</artifactId>
+  		<version>${hadoopVersion}</version>
+  		<scope>provided</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.apache.hadoop</groupId>
+  		<artifactId>hadoop-hdfs</artifactId>
+  		<version>${hadoopVersion}</version>
+  		<scope>provided</scope>
+  	</dependency>
+  </dependencies>
+</project>
